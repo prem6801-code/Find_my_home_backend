@@ -1,5 +1,6 @@
 const User = require("../DB/models");
-
+require("dotenv").config();
+const Enc_key = process.env.Enc_key;
 const register = async (req, res) => {
   const { fullName, mobile, email, password } = req.body;
   try {
@@ -21,11 +22,16 @@ const register = async (req, res) => {
       };
 
       const register = await User.create(newUser);
-      res.send({
-        status: 200,
-        data: register,
-        err: "",
-      });
+      res
+        .cookie(
+          "token",
+          jwt.sign({ email: register.email }, Enc_key, { expiresIn: "10m" })
+        )
+        .send({
+          status: 200,
+          data: register,
+          err: "",
+        });
     }
   } catch (err) {
     res.send({
@@ -35,6 +41,7 @@ const register = async (req, res) => {
     });
   }
 };
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -45,7 +52,7 @@ const login = async (req, res) => {
       fullName: 1,
       email: 1,
       mobile_no: 1,
-      _id: 0, 
+      _id: 0,
     });
 
     if (account) {
@@ -66,6 +73,13 @@ const login = async (req, res) => {
   }
 };
 
-const logout = async (req, res) => {};
+const logout = async (req, res) => {
+  res.cookie("token", "", { expires: new Date(0), httpOnly: true }); // Setting expires to the past
+  res.send({
+    status: 200,
+    data: "Sign Out Successfully",
+    err: "",
+  });
+};
 
 module.exports = { register, login, logout };
