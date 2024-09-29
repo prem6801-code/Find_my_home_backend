@@ -5,19 +5,21 @@ const user = new mongoose.Schema({
     type: String,
     require: true,
   },
-  first_name: {
-    type: String,
-    require: true,
-  },
-  last_name: {
+  fullName: {
     type: String,
     require: true,
   },
   mobile_no: {
     type: Number,
     require: true,
+    unique:true
   },
   email: {
+    type: String,
+    require: true,
+    unique:true,
+  },
+  password: {
     type: String,
     require: true,
   },
